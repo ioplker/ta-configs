@@ -7,6 +7,7 @@ end)
 
 -- PlantUML
 textadept.file_types.extensions['puml'] = 'plantuml'
+textadept.file_types.extensions['iuml'] = 'plantuml'
 
 
 -- Metatie
