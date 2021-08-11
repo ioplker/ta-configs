@@ -13,7 +13,7 @@ lex:add_rule('keyword', token(lexer.KEYWORD, word_match([[
   title desc link version author
 
   -- `styles` section
-  dmBgColor dmTitleBgColor dmTitleFgColor dmTitleBdColor elBdColor relColor
+  bgColor titleBgColor titleFgColor titleBdColor
 
   -- `elementClasses` section
   parent title desc bgColor fgColor bdColor bdWidth icon
