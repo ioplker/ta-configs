@@ -330,3 +330,8 @@ keys['ctrl+k'] = {
   u = to_uppercase,
   l = to_lowercase,
 }
+
+
+-- Save all files
+--* TODO: Remove `*` from labels of saved tabs
+keys['ctrl+alt+s'] = io.save_all_files
