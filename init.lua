@@ -7,7 +7,8 @@ require('general/languages')
 require('general/shortcuts-ru')
 --require('general/space-keys')
 require('textredux').hijack()
-
+require('file_diff')
+require('spellcheck').load('ru_RU')
 
 -- Lua reset
 keys['ctrl+esc'] = reset
