@@ -1,13 +1,32 @@
-function embed_semcom(prefix, lexer_name)
-  local lexer = require('lexer')
+-- Highlights comments:
+-- TODO: reminds to do something
+-- FIX: suggests to fix broken code
+-- NOTE: provides some informational details or constraints
+-- POOP: warns or questions about badly designed code, "hacks"
+
+
+-- NOTE: Call this before any comments rules as rules order is important!
+function add_semcom_rules(comment_prefix, lex, lexer)
+  -- Setting up styles - you can change comments' types and colors here
+  local comment_colors = {
+    todo = lexer.colors.yellow,
+    fix = lexer.colors.red,
+    note = lexer.colors.blue,
+    poop = lexer.colors.purple,
+  }
+
   local token = lexer.token
+  local semcom_styles = {}
 
-  local parent_lexer = lexer.load(lexer_name)
-  local semcom_lexer = lexer.load('semantic_comments')
+  for comment_type, fg_color in pairs(comment_colors) do
+    semcom_styles[comment_type] = {
+      italics = true,
+      bold = true,
+      back = lexer.colors.dark_black,
+      fore = fg_color,
+    }
 
-  local semcom_start_rule = token('semcom_start_tag', prefix)
-  local semcom_end_rule = token('semcom_end_tag', '\n')
-  parent_lexer:embed(semcom_lexer, semcom_start_rule, semcom_end_rule)
-
-  return parent_lexer
+    lex:add_rule(comment_type .. '_comment', token(comment_type .. '_comment', lexer.to_eol(comment_prefix .. ' ' .. string.upper(comment_type) .. ': ')))
+    lex:add_style(comment_type .. '_comment', semcom_styles[comment_type])
+  end
 end
