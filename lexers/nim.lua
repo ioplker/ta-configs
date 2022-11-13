@@ -103,4 +103,7 @@ lex:add_rule('number', token(lexer.NUMBER, float + integer))
 -- Operators.
 lex:add_rule('operator', token(lexer.OPERATOR, S('=+-*/<>@$~&%|!?^.:\\`()[]{},;')))
 
+-- Comment string (with whitespace) for `textadept.editing.toggle_comment()` function
+textadept.editing.comment_string.nim = '# '
+
 return lex

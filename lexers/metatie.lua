@@ -61,5 +61,7 @@ lex:add_rule('operator', token(lexer.REGEX,
   S('=')
 ))
 
+-- Comment string (with whitespace) for `textadept.editing.toggle_comment()` function
+textadept.editing.comment_string.metatie = '` '
 
 return lex

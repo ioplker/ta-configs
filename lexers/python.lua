@@ -107,4 +107,7 @@ lex:add_style('decorator', lexer.styles.preprocessor)
 -- Operators.
 lex:add_rule('operator', token(lexer.OPERATOR, S('!%^&*()[]{}-=+/|:;.,?<>~`')))
 
+-- Comment string (with whitespace) for `textadept.editing.toggle_comment()` function
+textadept.editing.comment_string.python = '# '
+
 return lex

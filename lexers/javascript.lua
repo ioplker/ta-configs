@@ -91,4 +91,7 @@ lex:add_fold_point(lexer.OPERATOR, '{', '}')
 lex:add_fold_point(lexer.COMMENT, '/*', '*/')
 lex:add_fold_point(lexer.COMMENT, lexer.fold_consecutive_lines('//'))
 
+-- Comment string (with whitespace) for `textadept.editing.toggle_comment()` function
+textadept.editing.comment_string.javascript = '// '
+
 return lex

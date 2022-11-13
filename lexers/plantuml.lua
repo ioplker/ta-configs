@@ -75,4 +75,7 @@ lex:add_rule('operator', token(lexer.REGEX,
 -- Fold points.
 lex:add_fold_point(lexer.OPERATOR, '{', '}')
 
+-- Comment string (with whitespace) for `textadept.editing.toggle_comment()` function
+textadept.editing.comment_string.plantuml = '` '
+
 return lex
