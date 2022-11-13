@@ -18,3 +18,8 @@ textadept.file_types.extensions['metatie'] = 'metatie'
 textadept.file_types.extensions['env'] = 'bash'
 textadept.file_types.extensions['env.example'] = 'bash'
 textadept.file_types.extensions['nix'] = 'bash'
+
+
+-- JS++
+textadept.file_types.extensions['jspp'] = 'jspp'
+textadept.file_types.extensions['js++'] = 'jspp'
