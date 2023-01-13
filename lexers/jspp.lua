@@ -66,7 +66,7 @@ lex:add_rule('constant',
 lex:add_rule('identifier', token(lexer.IDENTIFIER, lexer.word))
 
 -- Semantic comments.
-require('general/semantic_comments')
+require('general/semantic-comments')
 add_semcom_rules('//', lex, lexer)
 
 -- Regular comments.

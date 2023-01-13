@@ -1,4 +1,4 @@
--- Copyright 2018-2022 Mitchell. See LICENSE.
+-- Copyright 2018-2023 Mitchell. See LICENSE.
 
 local json = require('lsp.dkjson')
 
@@ -77,10 +77,6 @@ local json = require('lsp.dkjson')
 -- @field log_rpc (bool)
 --   Log RPC correspondence to the LSP message buffer.
 --   The default value is `false`.
--- @field INDIC_WARN (number)
---   The warning diagnostic indicator number.
--- @field INDIC_ERROR (number)
---   The error diagnostic indicator number.
 -- @field show_diagnostics (bool)
 --   Whether or not to show diagnostics.
 --   The default value is `true`, and shows them as annotations.
@@ -102,7 +98,6 @@ if not rawget(_L, 'Language Server') then
   _L['language server shell command:'] = 'language server shell command:'
   _L['Stop Server?'] = 'Stop Server?'
   _L['Stop the language server for'] = 'Stop the language server for'
-  _L['Query Symbol...'] = 'Query Symbol...'
   _L['Symbol name or name part:'] = 'Symbol name or name part:'
   -- Status.
   _L['Note: completion list incomplete'] = 'Note: completion list incomplete'
@@ -112,15 +107,15 @@ if not rawget(_L, 'Language Server') then
   _L['Language Server'] = 'Lan_guage Server'
   _L['Start Server...'] = '_Start Server...'
   _L['Stop Server'] = 'Sto_p Server'
-  _L['Goto Workspace Symbol...'] = 'Goto _Workspace Symbol...'
-  _L['Goto Document Symbol...'] = 'Goto Document S_ymbol...'
+  _L['Go To Workspace Symbol...'] = 'Go To _Workspace Symbol...'
+  _L['Go To Document Symbol...'] = 'Go To Document S_ymbol...'
   _L['Autocomplete'] = '_Autocomplete'
   _L['Show Hover Information'] = 'Show _Hover Information'
   _L['Show Signature Help'] = 'Show Si_gnature Help'
-  _L['Goto Declaration'] = 'Goto De_claration'
-  _L['Goto Definition'] = 'Goto _Definition'
-  _L['Goto Type Definition'] = 'Goto _Type Definition'
-  _L['Goto Implementation'] = 'Goto _Implementation'
+  _L['Go To Declaration'] = 'Go To De_claration'
+  _L['Go To Definition'] = 'Go To _Definition'
+  _L['Go To Type Definition'] = 'Go To _Type Definition'
+  _L['Go To Implementation'] = 'Go To _Implementation'
   _L['Find References'] = 'Find _References'
   _L['Select All Symbol'] = 'Select Al_l Symbol'
   _L['Toggle Show Diagnostics'] = 'Toggle Show Diagnosti_cs'
@@ -130,9 +125,6 @@ local lsp_events = {'lsp_initialized', 'lsp_notification'}
 for _, v in ipairs(lsp_events) do events[v:upper()] = v end
 
 M.log_rpc = false
-M.INDIC_WARN = _SCINTILLA.next_indic_number()
-M.INDIC_ERROR = _SCINTILLA.next_indic_number()
-
 M.show_diagnostics = true
 M.show_all_diagnostics = false
 
@@ -182,7 +174,7 @@ local xpm_map = {
 local completion_item_kind_set = {} -- for LSP capabilities
 for i = 1, #xpm_map do completion_item_kind_set[i] = i end
 
--- Map of LSP SymbolKinds to names shown in symbol filteredlists.
+-- Map of LSP SymbolKinds to names shown in symbol lists.
 local symbol_kinds = {
   'File', 'Module', 'Namespace', 'Package', 'Class', 'Method', 'Property', 'Field', 'Constructor',
   'Enum', 'Interface', 'Function', 'Variable', 'Constant', 'String', 'Number', 'Boolean', 'Array',
@@ -203,7 +195,7 @@ local Server = {}
 function Server.new(lang, cmd, init_options)
   local root = assert(io.get_project_root(), _L['No project root found'])
   local current_view = view
-  ui._print('[LSP]', 'Starting language server: ' .. cmd)
+  ui.print_to('[LSP]', 'Starting language server: ' .. cmd)
   ui.goto_view(current_view)
   local server = setmetatable({lang = lang, request_id = 0, incoming_messages = {}},
     {__index = Server})
@@ -473,12 +465,7 @@ end
 ---
 -- Silently logs the given message.
 -- @param message String message to log.
-function Server:log(message)
-  local silent_print = ui.silent_print
-  ui.silent_print = true
-  ui._print('[LSP]', message)
-  ui.silent_print = silent_print -- restore
-end
+function Server:log(message) ui.print_silent_to('[LSP]', message) end
 
 -- Converts the given LSP DocumentUri into a valid filename and returns it.
 -- @param uri LSP DocumentUri to convert into a filename.
@@ -504,16 +491,15 @@ end
 function Server:handle_notification(method, params)
   if method:find('^window/showMessage') then
     -- Show a message to the user.
-    local icons = {'gtk-dialog-error', 'gtk-dialog-warning', 'gtk-dialog-info'}
-    local dialog_options = {icon = icons[params.type], text = params.message, string_output = true}
+    local icons = {'dialog-error', 'dialog-warning', 'dialog-information'}
+    local dialog_options = {icon = icons[params.type], title = 'Message', text = params.message}
     if not method:find('Request') then
-      ui.dialogs.ok_msgbox(dialog_options)
+      ui.dialogs.message(dialog_options)
     else
       -- Present options in the message and respond with the selected option.
       for i = 1, #params.actions do dialog_options['button' .. i] = params.actions[i].title end
-      local result = {title = ui.dialogs.msgbox(dialog_options)}
-      -- TODO: option cannot be "delete"
-      if result.title == 'delete' then result = json.null end
+      local result = {title = params.actions[ui.dialogs.message(dialog_options)]}
+      if not result.title then result = json.null end
       self:respond(params.id, result)
     end
   elseif method == 'window/logMessage' then
@@ -530,7 +516,7 @@ function Server:handle_notification(method, params)
     local current_line = buffer:line_from_position(buffer.current_pos)
     local orig_lines_from_top = view:visible_from_doc_line(current_line) - view.first_visible_line
     -- Clear any existing diagnostics.
-    for _, indic in ipairs{M.INDIC_WARN, M.INDIC_ERROR} do
+    for _, indic in ipairs{textadept.run.INDIC_WARNING, textadept.run.INDIC_ERROR} do
       buffer.indicator_current = indic
       buffer:indicator_clear_range(1, buffer.length)
     end
@@ -538,7 +524,7 @@ function Server:handle_notification(method, params)
     -- Add diagnostics.
     for _, diagnostic in ipairs(params.diagnostics) do
       buffer.indicator_current = (not diagnostic.severity or diagnostic.severity == 1) and
-        M.INDIC_ERROR or M.INDIC_WARN -- TODO: diagnostic.tags
+        textadept.run.INDIC_ERROR or textadept.run.INDIC_WARNING -- TODO: diagnostic.tags
       local s, e = tobufferrange(diagnostic.range)
       local line = buffer:line_from_position(e)
       if M.show_all_diagnostics or (current_line ~= line and current_line + 1 ~= line) then
@@ -586,7 +572,7 @@ function Server:notify_opened()
     textDocument = {
       uri = not WIN32 and 'file://' .. buffer.filename or
         ('file:///' .. buffer.filename:gsub('\\', '/')), -- LuaFormatter
-      languageId = buffer:get_lexer(), version = 0, text = buffer:get_text()
+      languageId = buffer.lexer_language, version = 0, text = buffer:get_text()
     }
   })
   self._opened[buffer.filename] = true
@@ -597,7 +583,7 @@ end
 -- @param cmd Optional language server command to run. The default is read from `server_commands`.
 -- @name start
 function M.start(cmd)
-  local lang = buffer:get_lexer()
+  local lang = buffer.lexer_language
   if servers[lang] then return end -- already running
   servers[lang] = true -- sentinel until initialization is complete
   if not cmd then cmd = M.server_commands[lang] end
@@ -620,11 +606,11 @@ end
 -- Stops a running language server based on the current language.
 -- @name stop
 function M.stop()
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if not server then return end
   server:request('shutdown')
   server:notify('exit')
-  servers[buffer:get_lexer()] = nil
+  servers[buffer.lexer_language] = nil
 end
 
 -- Returns a LSP TextDocumentPositionParams structure based on the given or current position
@@ -656,7 +642,7 @@ end
 -- Jumps to the symbol selected from a list of LSP SymbolInformation or structures.
 -- @param symbols List of LSP SymbolInformation or DocumentSymbol structures.
 local function goto_selected_symbol(symbols)
-  -- Prepare items for display in a filteredlist dialog.
+  -- Prepare items for display in a list dialog.
   local items = {}
   for _, symbol in ipairs(symbols) do
     items[#items + 1] = symbol.name
@@ -669,13 +655,11 @@ local function goto_selected_symbol(symbols)
     end
     items[#items + 1] = tofilename(symbol.location.uri)
   end
-  -- Show the dialog.
-  local button, i = ui.dialogs.filteredlist{
-    title = 'Goto Symbol', columns = {'Name', 'Kind', 'Location'}, items = items
+  -- Show the dialog and jump to the selected symbol.
+  local i = ui.dialogs.list{
+    title = 'Go To Symbol', columns = {'Name', 'Kind', 'Location'}, items = items
   }
-  if button == -1 then return end
-  -- Jump to the selected symbol.
-  goto_location(symbols[i].location)
+  if i then goto_location(symbols[i].location) end
 end
 
 ---
@@ -685,7 +669,7 @@ end
 --   are presented from the current buffer.
 -- @name goto_symbol
 function M.goto_symbol(symbol)
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if not server or not buffer.filename then return end
   server:sync_buffer()
   local symbols
@@ -706,7 +690,7 @@ end
 
 -- Autocompleter function using a language server.
 textadept.editing.autocompleters.lsp = function()
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if server and buffer.filename and server.capabilities.completionProvider then
     server:sync_buffer()
     -- Fetch a completion list.
@@ -720,7 +704,11 @@ textadept.editing.autocompleters.lsp = function()
     for _, symbol in ipairs(completions) do
       local label = symbol.textEdit and symbol.textEdit.newText or symbol.insertText or symbol.label
       -- TODO: some labels can have spaces and need proper handling.
-      symbols[#symbols + 1] = string.format('%s?%d', label, xpm_map[symbol.kind]) -- TODO: auto_c_type_separator
+      if xpm_map[symbol.kind] > 0 then
+        symbols[#symbols + 1] = string.format('%s?%d', label, xpm_map[symbol.kind]) -- TODO: auto_c_type_separator
+      else
+        symbols[#symbols + 1] = label
+      end
       -- TODO: if symbol.preselect then symbols.selected = label end?
     end
     -- Return the autocompletion list.
@@ -742,7 +730,7 @@ end
 --   uses the current buffer position.
 -- @name hover
 function M.hover(position)
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if server and buffer.filename and server.capabilities.hoverProvider then
     server:sync_buffer()
     local hover = server:request('textDocument/hover', get_buffer_position_params(position))
@@ -770,7 +758,7 @@ function M.signature_help()
     events.emit(events.CALL_TIP_CLICK)
     return
   end
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if server and buffer.filename and server.capabilities.signatureHelpProvider then
     server:sync_buffer()
     signatures = server:request('textDocument/signatureHelp', get_buffer_position_params())
@@ -802,7 +790,7 @@ end
 -- Cycle through signatures.
 -- TODO: this conflicts with textadept.editing's CALL_TIP_CLICK handler.
 events.connect(events.CALL_TIP_CLICK, function(position)
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if server and buffer.filename and server.capabilities.signatureHelpProvider and signatures and
     signatures.active then
     signatures.active = signatures.active + (position == 1 and -1 or 1)
@@ -821,7 +809,7 @@ end)
 --   'typeDefinition', 'implementation').
 -- @return `true` if a declaration/definition was found; `false` otherwise
 local function goto_definition(kind)
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if server and buffer.filename and server.capabilities[kind .. 'Provider'] then
     server:sync_buffer()
     local location = server:request('textDocument/' .. kind, get_buffer_position_params())
@@ -831,13 +819,14 @@ local function goto_definition(kind)
       if #location == 1 then
         location = location[1]
       else
-        -- Select one from a filteredlist.
+        -- Select one from a list.
         local items = {}
         for i = 1, #location do items[#items + 1] = tofilename(location[i].uri) end
         local title =
-          (kind == 'declaration' and _L['Goto Declaration'] or _L['Goto Definition']):gsub('_', '')
-        local i = ui.dialogs.filteredlist{title = title, columns = _L['Filename'], items = items}
-        if i == -1 then return true end -- definition found; user canceled
+          (kind == 'declaration' and _L['Go To Declaration'] or _L['Go To Definition']):gsub('[_&]',
+            '')
+        local i = ui.dialogs.list{title = title, items = items}
+        if not i then return true end -- definition found; user canceled
         location = location[i]
       end
     end
@@ -874,7 +863,7 @@ function M.goto_implementation() return goto_definition('implementation') end
 -- Searches for project references to the current symbol and prints them.
 -- @name find_references
 function M.find_references()
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if server and buffer.filename and server.capabilities.referencesProvider then
     server:sync_buffer()
     local params = get_buffer_position_params()
@@ -884,14 +873,14 @@ function M.find_references()
     for _, location in ipairs(locations) do
       -- Print trailing ': ' to enable 'find in files' features like double-click, menu items,
       -- Return keypress, etc.
-      ui._print(_L['[Files Found Buffer]'],
+      ui.print_to(_L['[Files Found Buffer]'],
         string.format('%s:%d: ', tofilename(location.uri), location.range.start.line + 1))
     end
   end
 end
 
 -- TODO: function M.select()
---  local server = servers[buffer:get_lexer()]
+--  local server = servers[buffer.lexer_language]
 --  if server and buffer.filename and server.capabilities.selectionRangeProvider then
 --    server:sync_buffer()
 --    local params = get_buffer_position_params()
@@ -905,7 +894,7 @@ end
 -- Selects all instances of the symbol at the current position as multiple selections.
 -- @name select_all_symbol
 function M.select_all_symbol()
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if server and buffer.filename and server.capabilities.linkedEditingRangeProvider then
     server:sync_buffer()
     local ranges = server:request('textDocument/linkedEditingRange', get_buffer_position_params())
@@ -921,9 +910,9 @@ end
 -- connection when loading a session on startup. Connect to `events.BUFFER_AFTER_SWITCH` and
 -- `events.VIEW_AFTER_SWITCH` in order to gradually notify the LSP of files opened from a session.
 events.connect(events.INITIALIZED, function()
-  local function start() if M.server_commands[buffer:get_lexer()] then M.start() end end
+  local function start() if M.server_commands[buffer.lexer_language] then M.start() end end
   local function notify_opened()
-    local server = servers[buffer:get_lexer()]
+    local server = servers[buffer.lexer_language]
     if type(server) == 'table' then server:notify_opened() end
   end
   events.connect(events.LEXER_LOADED, start)
@@ -936,7 +925,7 @@ end)
 
 -- Notify the language server when a buffer is saved.
 events.connect(events.FILE_AFTER_SAVE, function(filename, saved_as)
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if not server then return end
   if saved_as then
     server:notify_opened()
@@ -944,7 +933,7 @@ events.connect(events.FILE_AFTER_SAVE, function(filename, saved_as)
     server:notify('textDocument/didSave', {
       textDocument = {
         uri = not WIN32 and 'file://' .. filename or 'file:///' .. filename:gsub('\\', '/'),
-        languageId = buffer:get_lexer(), version = 0
+        languageId = buffer.lexer_language, version = 0
       }
     })
   end
@@ -954,21 +943,13 @@ end)
 
 -- Query the language server for hover information when mousing over identifiers.
 events.connect(events.DWELL_START, function(position)
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if server then M.hover(position) end
 end)
 events.connect(events.DWELL_END, function()
   if not buffer.get_lexer then return end
-  local server = servers[buffer:get_lexer()]
+  local server = servers[buffer.lexer_language]
   if server then view:call_tip_cancel() end
-end)
-
--- Set diagnostic indicator styles.
-events.connect(events.VIEW_NEW, function()
-  view.indic_style[M.INDIC_WARN] = view.INDIC_SQUIGGLE
-  view.indic_fore[M.INDIC_WARN] = view.property_int['color.yellow']
-  view.indic_style[M.INDIC_ERROR] = view.INDIC_SQUIGGLE
-  view.indic_fore[M.INDIC_ERROR] = view.property_int['color.red']
 end)
 
 -- Gracefully shutdown language servers on reset. They will be restarted as buffers are reloaded.
@@ -976,7 +957,7 @@ events.connect(events.RESET_BEFORE, function()
   for _, server in ipairs(servers) do
     server:request('shutdown')
     server:notify('exit')
-    servers[buffer:get_lexer()] = nil
+    servers[buffer.lexer_language] = nil
   end
 end)
 
@@ -994,52 +975,48 @@ for i = 1, #m_tools - 1 do
       table.insert(m_tools, i, {
         title = _L['Language Server'],
         {_L['Start Server...'], function()
-          local server = servers[buffer:get_lexer()]
+          local server = servers[buffer.lexer_language]
           if server then
-            ui.dialogs.ok_msgbox{
-              title = _L['Start Server...']:gsub('_', ''),
-              text = string.format('%s %s', buffer:get_lexer(),
-                _L['language server is already running']),
-              no_cancel = true
+            ui.dialogs.message{
+              title = _L['Start Server...']:gsub('[_&]', ''),
+              text = string.format('%s %s', buffer.lexer_language,
+                _L['language server is already running'])
             }
             return
           end
-          local button, cmd = ui.dialogs.inputbox{
-            title = _L['Start Server...']:gsub('_', ''),
-            text = M.server_commands[buffer:get_lexer()] or '',
-            informative_text = string.format('%s %s', buffer:get_lexer(),
+          local cmd = ui.dialogs.input{
+            title = string.format('%s %s', buffer.lexer_language,
               _L['language server shell command:']),
-            button1 = _L['OK'], button2 = _L['Cancel']
+            text = M.server_commands[buffer.lexer_language]
           }
-          if button == 1 and cmd ~= '' then M.start(cmd) end
+          if cmd and cmd ~= '' then M.start(cmd) end
         end},
         {_L['Stop Server'], function()
-          local server = servers[buffer:get_lexer()]
+          local server = servers[buffer.lexer_language]
           if not server then return end
-          local button = ui.dialogs.ok_msgbox{
+          local button = ui.dialogs.message{
             title = _L['Stop Server?'],
-            text = string.format('%s %s?', _L['Stop the language server for'], buffer:get_lexer())
+            text = string.format('%s %s?', _L['Stop the language server for'], buffer.lexer_language)
           }
           if button == 1 then M.stop() end
         end},
         {''},
-        {_L['Goto Workspace Symbol...'], function()
-          local server = servers[buffer:get_lexer()]
+        {_L['Go To Workspace Symbol...'], function()
+          local server = servers[buffer.lexer_language]
           if not server then return end
-          local button, query = ui.dialogs.inputbox{
-            title = _L['Query Symbol...'], informative_text = _L['Symbol name or name part:'],
-            button1 = _L['OK'], button2 = _L['Cancel']
+          local query = ui.dialogs.input{
+            title = _L['Symbol name or name part:']
           }
-          if button == 1 and query ~= '' then M.goto_symbol(query) end
+          if query and query ~= '' then M.goto_symbol(query) end
         end},
-        {_L['Goto Document Symbol...'], M.goto_symbol},
+        {_L['Go To Document Symbol...'], M.goto_symbol},
         {_L['Autocomplete'], function() textadept.editing.autocomplete('lsp') end},
         {_L['Show Hover Information'], M.hover},
         {_L['Show Signature Help'], M.signature_help},
-        {_L['Goto Declaration'], M.goto_declaration},
-        {_L['Goto Definition'], M.goto_definition},
-        {_L['Goto Type Definition'], M.goto_type_definition},
-        {_L['Goto Implementation'], M.goto_implementation},
+        {_L['Go To Declaration'], M.goto_declaration},
+        {_L['Go To Definition'], M.goto_definition},
+        {_L['Go To Type Definition'], M.goto_type_definition},
+        {_L['Go To Implementation'], M.goto_implementation},
         {_L['Find References'], M.find_references},
         {_L['Select All Symbol'], M.select_all_symbol},
         {''},

@@ -1,55 +1,103 @@
 -- Tabs changing
-keys['ctrl+pgdn'] = function () view.goto_buffer(_G.view, 1) end
-keys['ctrl+pgup'] = function () view.goto_buffer(_G.view, -1) end
+LOCKED_BUFFER_MARKER = '%'
+UNSAVED_BUFFER_MARKER = '*'
 
+local function next_buffer() view.goto_buffer(_G.view, -1) end
+local function prev_buffer() view.goto_buffer(_G.view, 1) end
 
--- Readonly buffer
--- NOTE: Changes tab label!
---local ORIGINAL_TAB_LABELS = {}
---
---local SERVICE_BUFFERS = {
---  ['[Message Buffer]'] = '[Message Buffer]',
---  ['Untitled'] = 'Untitled'
---}
---
---local READONLY_MARKER = '[%] '
---
---local function remember_tab_label()
---  ORIGINAL_TAB_LABELS[buffer] = buffer.tab_label
---end
---
---local function update_tab_label()
--- FIX: Make this not hardcoded
---  if SERVICE_BUFFERS[buffer.filename] then return end
---
---  local filename = buffer.filename and buffer.filename:match("([^/]+)$") or 'Untitled'
---
---  if buffer.read_only then
---    if buffer.modify then
---      buffer.tab_label = READONLY_MARKER .. filename .. '*'
---    else
---      buffer.tab_label = READONLY_MARKER .. filename
---    end
---  else
---    if buffer.modify then
---      buffer.tab_label = filename .. '*'
---    else
---      buffer.tab_label = filename
---    end
---  end
---end
+local function move_buffer_left()
+  local cur_view_index = _BUFFERS[_G.buffer]
 
-local function toggle_buffer_readonly()
-  --if SERVICE_BUFFERS[buffer.filename] then return end
+  if cur_view_index-1 >= 1 then
+    _G.move_buffer(cur_view_index, cur_view_index-1)
 
-  buffer.read_only = not buffer.read_only
-  --update_tab_label()
+    events.emit('BUFFER_MOVED', _G.buffer)
+    events.emit('BUFFER_MOVED', _BUFFERS[cur_view_index])
+  end
 end
 
---events.connect(events.BUFFER_NEW, remember_tab_label)
---events.connect(events.BUFFER_AFTER_SWITCH, update_tab_label)
---events.connect(events.FILE_AFTER_SAVE, update_tab_label)
+local function move_buffer_right()
+  local cur_view_index = _BUFFERS[_G.buffer]
+
+  if _BUFFERS[cur_view_index+1] ~= nil then
+    _G.move_buffer(cur_view_index, cur_view_index+1)
+
+    events.emit('BUFFER_MOVED', _G.buffer)
+    events.emit('BUFFER_MOVED', _BUFFERS[cur_view_index])
+  end
+end
+
+local function go_to_buffer(number)
+  if _G._BUFFERS[number] ~= nil then
+    view.goto_buffer(view, _G._BUFFERS[number])
+  end
+end
+
+local function update_buffer_index_label(buffer)
+  local index = _G._BUFFERS[buffer]
+  local tab_title = 'Untitled'
+
+  -- NOTE: `buffer._type` not nil for system buffers like `[Message Buffer]` etc
+  if buffer._type ~= nil then
+    tab_title = buffer._type
+  elseif buffer.filename ~= nil then
+    tab_title = buffer.filename and buffer.filename:match("([^/]+)$")
+  end
+
+  if buffer.modify then
+    tab_title = tab_title .. UNSAVED_BUFFER_MARKER
+  end
+
+  if buffer.read_only and buffer._type == nil then
+    buffer.tab_label = '[' .. index .. '] [' .. LOCKED_BUFFER_MARKER .. '] ' .. tab_title
+  else
+    buffer.tab_label = '[' .. index .. '] ' .. tab_title
+  end
+end
+
+local function toggle_buffer_readonly()
+  if buffer._type == nil and buffer.filename ~= nil then
+    buffer.read_only = not buffer.read_only
+  end
+
+  update_buffer_index_label(buffer)
+end
+
+
+keys['ctrl+pgup'] = next_buffer
+keys['ctrl+pgdn'] = prev_buffer
+keys['ctrl+shift+pgup'] = move_buffer_left
+keys['ctrl+shift+pgdn'] = move_buffer_right
+keys['alt+1'] = function() go_to_buffer(1) end
+keys['alt+2'] = function() go_to_buffer(2) end
+keys['alt+3'] = function() go_to_buffer(3) end
+keys['alt+4'] = function() go_to_buffer(4) end
+keys['alt+5'] = function() go_to_buffer(5) end
+keys['alt+6'] = function() go_to_buffer(6) end
+keys['alt+7'] = function() go_to_buffer(7) end
+keys['alt+8'] = function() go_to_buffer(8) end
+keys['alt+9'] = function() go_to_buffer(9) end
 keys['ctrl+%'] = toggle_buffer_readonly
+
+events.connect('BUFFER_MOVED', update_buffer_index_label)
+events.connect(events.UPDATE_UI, function() update_buffer_index_label(buffer) end)
+
+-- Save buffer on switching away from it
+local function save_buffer_with_file()
+  if buffer.modify and buffer.filename ~= nil then
+    buffer.save(buffer)
+    update_buffer_index_label(buffer)
+  end
+end
+
+events.connect(events.BUFFER_BEFORE_SWITCH, save_buffer_with_file)
+events.connect(events.VIEW_BEFORE_SWITCH, save_buffer_with_file)
+events.connect(events.FILE_AFTER_SAVE, save_buffer_with_file)
+
+-- NOTE: `events.UNFOCUS` doesn't work in terminal TA
+-- NOTE: Also it is triggered by wm closing, so exiting saves all unsaved buffers
+-- NOTE:   (but still prompts for buffers without files)
+events.connect(events.UNFOCUS, save_buffer_with_file)
 
 
 -- Reopen just closed buffer

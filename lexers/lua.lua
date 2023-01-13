@@ -125,7 +125,7 @@ lex:add_rule('string', token(lexer.STRING, sq_str + dq_str) + token('longstring'
 lex:add_style('longstring', lexer.styles.string)
 
 -- Semantic comments.
-require('general/semantic_comments')
+require('general/semantic-comments')
 add_semcom_rules('--', lex, lexer)
 
 -- Regular comments.

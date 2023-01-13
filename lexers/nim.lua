@@ -81,7 +81,7 @@ lex:add_rule('string', token(lexer.STRING, tq_str + sq_str + dq_str + raw_str))
 lex:add_rule('identifier', token(lexer.IDENTIFIER, lexer.word))
 
 -- Semantic comments.
-require('general/semantic_comments')
+require('general/semantic-comments')
 add_semcom_rules('#', lex, lexer)
 
 -- Regular comments.
