@@ -5,28 +5,51 @@
 -- POOP: warns or questions about badly designed code, "hacks"
 
 
--- NOTE: Call this before any comments rules as rules order is important!
-function add_semcom_rules(comment_prefix, lex, lexer)
-  -- Setting up styles - you can change comments' types and colors here
-  local comment_colors = {
-    todo = lexer.colors.yellow,
-    fix = lexer.colors.red,
-    note = lexer.colors.blue,
-    poop = lexer.colors.purple,
+-- NOTE: 1) Add rules into lexer (copy lexer to `.textadept/lexers/`)
+--[[ Lua example below
+-- Comments.
+-- NOTE: <custom-lexer-part>
+local COMMENT_PREFIX = '--'
+
+lex:add_rule('todo_comment', lex:tag('todo_comment', lexer.to_eol(COMMENT_PREFIX .. ' TODO:')))
+lex:add_rule('fix_comment', lex:tag('fix_comment', lexer.to_eol(COMMENT_PREFIX .. ' FIX:')))
+lex:add_rule('note_comment', lex:tag('note_comment', lexer.to_eol(COMMENT_PREFIX .. ' NOTE:')))
+lex:add_rule('poop_comment', lex:tag('poop_comment', lexer.to_eol(COMMENT_PREFIX .. ' POOP:')))
+
+local simple_comment = lexer.to_eol(COMMENT_PREFIX)
+local block_comment = COMMENT_PREFIX * longstring
+lex:add_rule('comment', lex:tag(lexer.COMMENT, block_comment + simple_comment))
+-- NOTE: </custom-lexer-part>
+]]
+
+-- NOTE: 2) Call `set_semcom_styles` in desired theme (copy theme to `.textadept/themes/` if it is builtin)
+--[[
+  -- NOTE: Semantic comments
+  require('general/semantic-comments').set_semcom_styles(styles)
+]]
+
+local M = {}
+
+function M.set_semcom_styles(styles)
+  styles['todo_comment'] = {
+    italics = true, bold = true,
+    back = 0x000000, fore = 0x009999,
   }
 
-  local token = lexer.token
-  local semcom_styles = {}
+  styles['fix_comment'] = {
+    italics = true, bold = true,
+    back = 0x000000, fore = 0x000099,
+  }
 
-  for comment_type, fg_color in pairs(comment_colors) do
-    semcom_styles[comment_type] = {
-      italics = true,
-      bold = true,
-      back = lexer.colors.dark_black,
-      fore = fg_color,
-    }
+  styles['note_comment'] = {
+    italics = true, bold = true,
+    back = 0x000000, fore = 0xCC6600,
+  }
 
-    lex:add_rule(comment_type .. '_comment', token(comment_type .. '_comment', lexer.to_eol(comment_prefix .. ' ' .. string.upper(comment_type) .. ': ')))
-    lex:add_style(comment_type .. '_comment', semcom_styles[comment_type])
-  end
+  styles['poop_comment'] = {
+    italics = true, bold = true,
+    back = 0x000000, fore = 0x990099,
+  }
 end
+
+return M

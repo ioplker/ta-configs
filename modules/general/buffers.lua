@@ -1,3 +1,6 @@
+local bind = require('shortcuts').bind
+
+
 -- Tabs changing
 LOCKED_BUFFER_MARKER = '%'
 UNSAVED_BUFFER_MARKER = '*'
@@ -64,20 +67,20 @@ local function toggle_buffer_readonly()
 end
 
 
-keys['ctrl+pgup'] = next_buffer
-keys['ctrl+pgdn'] = prev_buffer
-keys['ctrl+shift+pgup'] = move_buffer_left
-keys['ctrl+shift+pgdn'] = move_buffer_right
-keys['alt+1'] = function() go_to_buffer(1) end
-keys['alt+2'] = function() go_to_buffer(2) end
-keys['alt+3'] = function() go_to_buffer(3) end
-keys['alt+4'] = function() go_to_buffer(4) end
-keys['alt+5'] = function() go_to_buffer(5) end
-keys['alt+6'] = function() go_to_buffer(6) end
-keys['alt+7'] = function() go_to_buffer(7) end
-keys['alt+8'] = function() go_to_buffer(8) end
-keys['alt+9'] = function() go_to_buffer(9) end
-keys['ctrl+%'] = toggle_buffer_readonly
+bind('ctrl+pgup', next_buffer)
+bind('ctrl+pgdn', prev_buffer)
+bind('ctrl+shift+pgup', move_buffer_left)
+bind('ctrl+shift+pgdn', move_buffer_right)
+bind('alt+1', function() go_to_buffer(1) end)
+bind('alt+2', function() go_to_buffer(2) end)
+bind('alt+3', function() go_to_buffer(3) end)
+bind('alt+4', function() go_to_buffer(4) end)
+bind('alt+5', function() go_to_buffer(5) end)
+bind('alt+6', function() go_to_buffer(6) end)
+bind('alt+7', function() go_to_buffer(7) end)
+bind('alt+8', function() go_to_buffer(8) end)
+bind('alt+9', function() go_to_buffer(9) end)
+bind('ctrl+%', toggle_buffer_readonly)
 
 events.connect('BUFFER_MOVED', update_buffer_index_label)
 events.connect(events.UPDATE_UI, function() update_buffer_index_label(buffer) end)
@@ -95,8 +98,10 @@ events.connect(events.VIEW_BEFORE_SWITCH, save_buffer_with_file)
 events.connect(events.FILE_AFTER_SAVE, save_buffer_with_file)
 
 -- NOTE: `events.UNFOCUS` doesn't work in terminal TA
--- NOTE: Also it is triggered by wm closing, so exiting saves all unsaved buffers
--- NOTE:   (but still prompts for buffers without files)
+--[[
+Also it is triggered by wm closing, so exiting saves all unsaved buffers
+  (but still prompts for buffers without files)
+]]
 events.connect(events.UNFOCUS, save_buffer_with_file)
 
 
@@ -189,4 +194,4 @@ end
 events.connect(events.INITIALIZED, record_all_opened_filenames)
 events.connect(events.FILE_OPENED, record_opened_filename)
 events.connect(events.BUFFER_DELETED, handle_closed_buffer)
-keys['ctrl+T'] = reopen_closed_file
+bind('ctrl+T', reopen_closed_file)

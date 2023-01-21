@@ -110,3 +110,6 @@ view.edge_color = colors.base02
 colors.red = colors.base08
 colors.green = colors.base0B
 colors.yellow = colors.base0E
+
+-- NOTE: Semantic comments
+require('general/semantic-comments').set_semcom_styles(styles)

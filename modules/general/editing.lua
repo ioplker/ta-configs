@@ -1,3 +1,6 @@
+local bind = require('shortcuts').bind
+
+
 -- Indentation
 buffer.use_tabs = false
 buffer.tab_width = 2
@@ -13,11 +16,6 @@ textadept.editing.highlight_words = textadept.editing.HIGHLIGHT_SELECTED
 
 -- Search
 ui.find.highlight_all_matches = true
-
-
--- Continous word multiselection
--- (like ctrl+d in Sublime Text 3)
-keys['ctrl+d'] = textadept.editing.select_word
 
 
 -- Autocomplete for multiline selection
@@ -44,7 +42,7 @@ local function toggle_wrap_mode()
   end
 end
 
-keys['alt+z'] = toggle_wrap_mode
+bind('alt+z', toggle_wrap_mode)
 
 
 -- Go to view by Ctrl+<VIEW NUMBER>
@@ -54,15 +52,15 @@ local function go_to_view(number)
   end
 end
 
-keys['ctrl+1'] = function() go_to_view(1) end
-keys['ctrl+2'] = function() go_to_view(2) end
-keys['ctrl+3'] = function() go_to_view(3) end
-keys['ctrl+4'] = function() go_to_view(4) end
-keys['ctrl+5'] = function() go_to_view(5) end
-keys['ctrl+6'] = function() go_to_view(6) end
-keys['ctrl+7'] = function() go_to_view(7) end
-keys['ctrl+8'] = function() go_to_view(8) end
-keys['ctrl+9'] = function() go_to_view(9) end
+bind('ctrl+1', function() go_to_view(1) end)
+bind('ctrl+2', function() go_to_view(2) end)
+bind('ctrl+3', function() go_to_view(3) end)
+bind('ctrl+4', function() go_to_view(4) end)
+bind('ctrl+5', function() go_to_view(5) end)
+bind('ctrl+6', function() go_to_view(6) end)
+bind('ctrl+7', function() go_to_view(7) end)
+bind('ctrl+8', function() go_to_view(8) end)
+bind('ctrl+9', function() go_to_view(9) end)
 
 
 -- Folding
@@ -94,9 +92,9 @@ local function expand_fold(line)
   end
 end
 
-keys['ctrl+['] = collapse_fold
-keys['ctrl+]'] = expand_fold
-keys['ctrl+.'] = toggle_fold
+bind('ctrl+[', collapse_fold)
+bind('ctrl+]', expand_fold)
+bind('ctrl+.', toggle_fold)
 
 
 -- Lines actions
@@ -153,14 +151,14 @@ local function duplicate_lines()
   end
 end
 
-keys['ctrl+D'] = duplicate_lines
-keys['ctrl+c'] = copy_text_or_line
-keys['ctrl+v'] = paste_text_or_line
-keys['ctrl+x'] = cut_text_or_line
+bind('ctrl+D', duplicate_lines)
+bind('ctrl+c', copy_text_or_line)
+bind('ctrl+v', paste_text_or_line)
+bind('ctrl+x', cut_text_or_line)
 
 
 -- Go to line by number
-keys['ctrl+g'] = textadept.editing.goto_line
+bind('ctrl+g', textadept.editing.goto_line)
 
 
 -- Search with selected word
@@ -172,7 +170,7 @@ local function start_search_from_selection()
   ui.find.focus()
 end
 
-keys['ctrl+f'] = start_search_from_selection
+bind('ctrl+f', start_search_from_selection)
 
 
 -- Change case
@@ -184,18 +182,14 @@ local function to_lowercase()
   _G.buffer.lower_case(_G.buffer)
 end
 
-keys['ctrl+u'] = nil
-keys['ctrl+k'] = {
-  ['u'] = to_uppercase,
+bind('ctrl+k', {
   ['ctrl+u'] = to_uppercase,
-
-  ['l'] = to_lowercase,
   ['ctrl+l'] = to_lowercase,
-}
+})
 
 
 -- Save all files
-keys['ctrl+alt+s'] = io.save_all_files
+bind('ctrl+alt+s', io.save_all_files)
 
 
 -- Cancel selection and other intermediate actions on Escape
@@ -208,4 +202,4 @@ local function cancel_actions()
   end
 end
 
-keys['esc'] = cancel_actions
+bind('esc', cancel_actions)

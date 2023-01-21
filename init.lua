@@ -1,35 +1,31 @@
-require('spellcheck').load('ru_RU')
-require('textredux').hijack()
+-- require('spellcheck').load('ru_RU')
+-- FIX: Sync with `shortcuts` module
+--require('textredux').hijack()
 require('file_diff')
+
+-- FIX: Broke on TA12
+--[[
 require('ta-tweaks/util')
 require('ta-tweaks/ctrl_tab_mru')
+]]
 
 -- My settings
+require('shortcuts').hijack()  -- NOTE: Other settings from `general` depend on this module for binding
 require('general/theme')
 require('general/editing')
 require('general/buffers')
 require('general/files')
 require('general/languages')
-require('general/shortcuts-ru')
 
--- Lua reset
-keys['ctrl+esc'] = reset
-
-
--- Open settings (need to remap for other shortcut)
-keys['ctrl+,'] = function()
-  io.open_file(_G._USERHOME .. '/init.lua')
-end
-
-
--- Open draft file (for some temp data etc)
-keys['alt+d'] = function()
-  io.open_file(_G._USERHOME .. '/DRAFT')
-end
-
+-- TODO: Look through default shortcuts for inspiration / tuning / turning off
+--[[
+  use `keys.command_mode` to entirely turn of default shortcuts and use mine ^_^
+]]
 
 -- TODO: Save cursor position on buffer auto-saving (when switching buffers)
---  happens when caret is on trailing whitespace at line end
+--[[
+  happens when caret is on trailing whitespace at line end
+]]
 -- TODO: Go to next line on (un)commenting
 -- TODO: Don't go to file end on opening
 -- TODO: Add command to fold/unfold on specific levels
@@ -42,17 +38,21 @@ end
 -- TODO: Do not move (scroll) on toggling buffer's wrap mode (`buffer.anchor`?)
 -- TODO: Do not move (scroll) on creating/deleting views (`buffer.anchor`?)
 
+-- FIX: Redraw tabs' labels on file closing
+-- TODO: Highlight current view (`view:set_styles()`)
 -- TODO: Spellcheck comments too
 -- TODO: Spellcheck all text in markdown
 -- TODO: LSP for Elixir
 -- TODO: Code formatter for Elixir (https://github.com/orbitalquark/textadept-format)
 -- TODO: Highlight brackets in lexers generally
 -- TODO: Send signals to `nnn` and `urxvt`:
---   - change cwd of nnn when file focused
---   - toggle / go to nnn on `ctrl+e` (don't close app, save size and position)
---   - toggle / go to urxvt on `ctrl+t` (don't close app, save size and position)
---   - close all apps with TA
---   - use sessions as projects
+--[[
+  - change cwd of nnn when file focused
+  - toggle / go to nnn on `ctrl+e` (don't close app, save size and position)
+  - toggle / go to urxvt on `ctrl+t` (don't close app, save size and position)
+  - close all apps with TA
+  - use sessions as projects
+]]
 
 -- TODO: Open apps from nnn in the same i3 place as TA
 -- TODO: Extend html lexer to recognize JS in tags' attributes (e.g. for angular or alpinejs)
@@ -62,8 +62,24 @@ end
 -- TODO: Snippets for PlantUML
 -- TODO: Snippets for OpenAPI
 -- TODO: Snippets of semantic comments (can determine comment symbols progrmmatically?)
+-- TODO: Refactor semantic comments for new lexers (see manual, done for lua)
 -- TODO: Make `general` settings more modular
--- TODO: Look through default shortcuts for inspiration / tuning / turning off
---   use `keys.command_mode` to entirely turn of default shortcuts and use mine
+-- TODO: Fix `ctrl_tabs_mru` to remember system buffers without files (like `[Message Buffer]`)
 
 -- TODO: Create readme
+-- FIX: Markdown lexer
+-- TODO: Create new theme based on `base16-tomorrow-night`
+--[[Highlight:
+  - semantic comments
+  - brackets
+  - quotes
+  - dot-accessed properties / methods / etc
+  - operators (+, -, *, = etc)
+]]
+
+-- TODO: Make `ctrl+left`, `ctrl+d` etc to count symbols inside quotes as a word
+--[[
+  E.g. select all hashes when between them: `print('########')`
+]]
+
+-- TODO: Tune menus

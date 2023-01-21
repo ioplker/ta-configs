@@ -31,8 +31,8 @@ local ru_en_map = {
 local function keypress_ru(code, shift, control, alt, cmd, caps_lock)
   -- Uncomment line below to print key code to message buffer
   -- Helpful for editing key map
-  --ui.print(code)
-  --ui.print(code < 256 and (not CURSES or (code ~= 7 and code ~= 13)) and string.char(code) or keys.KEYSYMS[code])
+  -- print(code)
+  -- print(code < 256 and (not CURSES or (code ~= 7 and code ~= 13)) and string.char(code) or keys.KEYSYMS[code])
 
   -- Intercept only ru key with modifier pressed
   if not ru_en_map[code] or (not control and not alt and not cmd) then return end

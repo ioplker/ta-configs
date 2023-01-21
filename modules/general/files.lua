@@ -1,3 +1,6 @@
+local bind = require('shortcuts').bind
+
+
 -- Open project (or nearby) files
 local function open_project_files()
   if not buffer.filename then
@@ -12,4 +15,4 @@ local function open_project_files()
   end
 end
 
-keys['ctrl+p'] = open_project_files
+bind('ctrl+p', open_project_files)
