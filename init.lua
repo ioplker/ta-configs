@@ -1,7 +1,7 @@
 -- require('spellcheck').load('ru_RU')
 -- FIX: Sync with `shortcuts` module
 --require('textredux').hijack()
-require('file_diff')
+-- require('file_diff')
 
 -- FIX: Broke on TA12
 --[[
@@ -9,28 +9,56 @@ require('ta-tweaks/util')
 require('ta-tweaks/ctrl_tab_mru')
 ]]
 
+
 -- My settings
 require('shortcuts').hijack()  -- NOTE: Other settings from `general` depend on this module for binding
-require('general/theme')
-require('general/editing')
 require('general/buffers')
-require('general/files')
 require('general/languages')
 
--- TODO: Look through default shortcuts for inspiration / tuning / turning off
---[[
-  use `keys.command_mode` to entirely turn of default shortcuts and use mine ^_^
-]]
+
+if not CURSES then
+  view:set_theme('base16-tomorrow-night', {font = 'Hack', size = 16})
+end
+
+buffer.use_tabs = false
+buffer.tab_width = 2
+
+buffer.auto_c_multi = buffer.MULTIAUTOC_EACH
+
+textadept.editing.strip_trailing_spaces = true
+textadept.editing.highlight_words = textadept.editing.HIGHLIGHT_SELECTED
+ui.find.highlight_all_matches = true
+
+
+view.end_at_last_line = false
+
+view.edge_column = 80
+view.edge_mode = view.EDGE_LINE
+
+view.wrap_visual_flags = view.WRAPVISUALFLAG_END
+
+view.fold_by_indentation = true
+
+
+
+
+
+
+
+
+
+
+
 
 -- TODO: Save cursor position on buffer auto-saving (when switching buffers)
 --[[
   happens when caret is on trailing whitespace at line end
 ]]
 -- TODO: Go to next line on (un)commenting
+-- TODO: Add `command palette`
 -- TODO: Don't go to file end on opening
 -- TODO: Add command to fold/unfold on specific levels
 -- TODO: Place closing bracket only if next symbol is a whitespace (or newline)
--- TODO: Do not copy text to clipboard when dublicating line (select a word, than `ctrl+shift+d` and check clipboard)
 -- TODO: Enclose selected text in brackets and quotes (`textadept.editing.enclose(left, right, select)`)
 -- TODO: Copy/paste with multiline selection (paste to coresponding line - not all copied text at once; `buffer.MULTIPASTE_EACH`?)
 -- TODO: Make comment/uncomment and folding consistent with russian and english layout (remove folding on dot)
@@ -44,7 +72,6 @@ require('general/languages')
 -- TODO: Spellcheck all text in markdown
 -- TODO: LSP for Elixir
 -- TODO: Code formatter for Elixir (https://github.com/orbitalquark/textadept-format)
--- TODO: Highlight brackets in lexers generally
 -- TODO: Send signals to `nnn` and `urxvt`:
 --[[
   - change cwd of nnn when file focused
@@ -83,3 +110,5 @@ require('general/languages')
 ]]
 
 -- TODO: Tune menus
+-- TODO: Add script to get all semcoms recursively from directory
+-- FIX: Folding breaks when commenting fold's parent line
