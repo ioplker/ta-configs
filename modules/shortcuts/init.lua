@@ -65,14 +65,16 @@ function M.hijack()
 
   events.connect(events.UPDATE_UI, function() keys.mode = 'custom_keys' end)
   events.connect(events.KEY, handle_keypress)
+
+  return keys.custom_keys
 end
 
 function M.bind(shortcut, callback_or_mode)
   keys.custom_keys[shortcut] = callback_or_mode
 end
 
-local default_bindings = require('shortcuts.bindings')
-for k, v in pairs(default_bindings) do
+local _default_bindings = require('shortcuts.bindings')
+for k, v in pairs(_default_bindings) do
   M.bind(k, v)
 end
 

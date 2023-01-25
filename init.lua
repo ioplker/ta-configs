@@ -1,6 +1,16 @@
 -- require('spellcheck').load('ru_RU')
+
+-- My settings
+-- local command_mode = require('shortcuts').hijack()  -- NOTE: Other settings from `general` depend on this module for binding
+require('shortcuts').hijack()  -- NOTE: Other settings from `general` depend on this module for binding
+require('general/buffers')
+require('general/languages')
+
+
 -- FIX: Sync with `shortcuts` module
---require('textredux').hijack()
+-- TODO: Replace by integration with `nnn`?
+-- --require('textredux').hijack(command_mode)
+-- require('textredux').hijack()
 -- require('file_diff')
 
 -- FIX: Broke on TA12
@@ -8,12 +18,6 @@
 require('ta-tweaks/util')
 require('ta-tweaks/ctrl_tab_mru')
 ]]
-
-
--- My settings
-require('shortcuts').hijack()  -- NOTE: Other settings from `general` depend on this module for binding
-require('general/buffers')
-require('general/languages')
 
 
 if not CURSES then
@@ -66,7 +70,6 @@ view.fold_by_indentation = true
 -- TODO: Do not move (scroll) on toggling buffer's wrap mode (`buffer.anchor`?)
 -- TODO: Do not move (scroll) on creating/deleting views (`buffer.anchor`?)
 
--- FIX: Redraw tabs' labels on file closing
 -- TODO: Highlight current view (`view:set_styles()`)
 -- TODO: Spellcheck comments too
 -- TODO: Spellcheck all text in markdown
