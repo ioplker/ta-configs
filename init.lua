@@ -1,4 +1,4 @@
--- require('spellcheck').load('ru_RU')
+require('spellcheck').load('ru_RU')
 
 -- My settings
 -- local command_mode = require('shortcuts').hijack()  -- NOTE: Other settings from `general` depend on this module for binding

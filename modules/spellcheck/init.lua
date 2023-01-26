@@ -1,4 +1,4 @@
--- Copyright 2015-2022 Mitchell. See LICENSE.
+-- Copyright 2015-2023 Mitchell. See LICENSE.
 
 local M = {}
 
@@ -32,17 +32,19 @@ local M = {}
 -- ### Compiling
 --
 -- Releases include binaries, so building this modules should not be necessary. If you want
--- to build manually, run `make deps` followed by `make spell.so`. This assumes the module is
--- installed in Textadept's *modules/* directory. If it is not (e.g. it is in your `_USERHOME`),
--- run `make ta=/path/to/textadept spell.so`.
+-- to build manually, use CMake. For example:
+--
+--     cmake -S . -B build_dir
+--     cmake --build build_dir
+--     cmake --install build_dir
 --
 -- ### Key Bindings
 --
--- Windows, Linux, BSD | macOS | Terminal | Command
+-- Windows and Linux | macOS | Terminal | Command
 -- -|-|-|-
 -- **Tools**| | |
--- F7 | F7 | F7 | Check spelling interactively
--- Shift+F7 | ⇧F7 | S-F7 | Mark misspelled words
+-- Ctrl+: | ⌘: | M-: | Check spelling interactively
+-- Ctrl+; | ⌘; | M-; | Mark misspelled words
 --
 -- @field check_spelling_on_save (bool)
 --   Check spelling after saving files.
@@ -75,11 +77,7 @@ if not rawget(_L, 'Spelling') then
 end
 
 local lib = 'spellcheck.spell'
-if OSX then
-  lib = lib .. 'osx'
-elseif WIN32 and CURSES then
-  lib = lib .. '-curses'
-end
+if OSX then lib = lib .. 'osx' end
 M.spell = require(lib)
 
 ---
@@ -279,12 +277,10 @@ events.connect(events.INDICATOR_CLICK, function(position)
 end)
 
 -- Set up indicators, add a menu, and configure key bindings.
-local function set_properties()
+events.connect(events.VIEW_NEW, function()
   view.indic_style[M.INDIC_SPELLING] = not CURSES and view.INDIC_DIAGONAL or view.INDIC_STRAIGHTBOX
-  view.indic_fore[M.INDIC_SPELLING] = view.property_int['color.red']
-end
-events.connect(events.VIEW_NEW, set_properties)
-events.connect(events.BUFFER_NEW, set_properties)
+  view.indic_fore[M.INDIC_SPELLING] = view.colors.red
+end)
 
 -- Add menu entries and configure key bindings.
 -- (Insert 'Spelling' menu in alphabetical order.)
@@ -315,10 +311,8 @@ for i = 1, #m_tools - 1 do
             ::continue::
           end
           local button
-          button, i = ui.dialogs.filteredlist{
-            title = _L['Select Dictionary'], columns = _L['Name'], items = dicts
-          }
-          if button == 1 and i then M.load(dicts[i]) end
+          i = ui.dialogs.list{title = _L['Select Dictionary'], items = dicts}
+          if i then M.load(dicts[i]) end
         end},
         SEP,
         {_L['Open User Dictionary'], function()
@@ -331,8 +325,9 @@ for i = 1, #m_tools - 1 do
     end
   end
 end
-keys.f7 = m_tools[_L['Spelling']][_L['Check Spelling...']][2]
-keys['shift+f7'] = M.check_spelling
+local mod = (WIN32 or LINUX) and 'ctrl' or OSX and 'cmd' or CURSES and 'meta'
+keys[mod .. '+:'] = m_tools[_L['Spelling']][_L['Check Spelling...']][2]
+keys[mod .. '+;'] = M.check_spelling
 
 return M
 

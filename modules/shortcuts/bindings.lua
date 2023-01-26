@@ -2,6 +2,7 @@ local editing = require('general.editing')
 local buffers = require('general.buffers')
 local navigation = require('general.navigation')
 local semcom = require('general.semantic-comments')
+local spellcheck = require('spellcheck')
 
 local M = {}
 
@@ -129,4 +130,5 @@ M['alt+/'] = {
   p = semcom.paste_poop,
 }
 
+M['f7'] = function() spellcheck.check_spelling(true) end
 return M
