@@ -52,4 +52,16 @@ function M.set_semcom_styles(styles)
   }
 end
 
+function _paste_semcom(semcom_type)
+  local semcom = textadept.editing.comment_string[buffer.lexer_language]
+  semcom = semcom .. semcom_type .. ': '
+  buffer.line_end()
+  buffer.add_text('\n' .. semcom)
+end
+
+function M.paste_todo() _paste_semcom('TODO') end
+function M.paste_fix() _paste_semcom('FIX') end
+function M.paste_note() _paste_semcom('NOTE') end
+function M.paste_poop() _paste_semcom('POOP') end
+
 return M

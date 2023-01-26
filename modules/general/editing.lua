@@ -64,11 +64,8 @@ function M.duplicate_lines()
     buffer.goto_pos(buffer.selection_end)
     buffer.selection_mode = prev_sel_mode
 
-    buffer.line_down()
-    buffer.home()
-    buffer.add_text('\n')
-    buffer.line_up()
-    buffer.insert_text(-1, lines)
+    buffer.line_end()
+    buffer.add_text('\n' .. lines)
 
     local inserted_start = buffer.position_from_line(end_line_num + 1)
     local inserted_end = buffer.position_from_line(end_line_num + copied_lines_count + 1)
@@ -77,5 +74,23 @@ function M.duplicate_lines()
     buffer.line_end_display_extend()
   end
 end
+
+function M.toggle_comment()
+  textadept.editing.toggle_comment()
+  buffer.line_down()
+end
+
+function M.complete_word()
+  if textadept.editing.autocomplete('word') then
+    return
+  else
+    buffer.tab()
+  end
+end
+
+local _drop_completed_word_tail = function()
+  buffer.del_word_right()
+end
+events.connect(events.AUTO_C_COMPLETED, _drop_completed_word_tail)
 
 return M

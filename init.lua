@@ -115,3 +115,5 @@ view.fold_by_indentation = true
 -- TODO: Tune menus
 -- TODO: Add script to get all semcoms recursively from directory
 -- FIX: Folding breaks when commenting fold's parent line
+-- FIX: Ctrl+tab and ctrl+shift+tab
+-- TODO: Change buffers only in current view

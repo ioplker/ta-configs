@@ -1,6 +1,7 @@
 local editing = require('general.editing')
 local buffers = require('general.buffers')
 local navigation = require('general.navigation')
+local semcom = require('general.semantic-comments')
 
 local M = {}
 
@@ -37,7 +38,7 @@ M['ctrl+V'] = textadept.editing.paste_reindent
 M['ctrl+d'] = textadept.editing.select_word
 M['ctrl+a'] = buffer.select_all
 
-M['ctrl+/'] = textadept.editing.toggle_comment
+M['ctrl+/'] = editing.toggle_comment
 
 M['ctrl+shift+down'] = buffer.move_selected_lines_down
 M['ctrl+shift+up'] = buffer.move_selected_lines_up
@@ -46,6 +47,8 @@ M['ctrl+k'] = {
   ['ctrl+u'] = buffer.upper_case,
   ['ctrl+l'] = buffer.lower_case,
 }
+
+M['\t'] = editing.complete_word
 
 
 --[[----------------------------------------------------------------------------
@@ -70,7 +73,9 @@ M['ctrl+F'] = navigation.search_selected_in_files
 
 M['ctrl+g'] = textadept.editing.goto_line
 
+M['ctrl+\t'] = navigation.goto_next_buffer  -- TODO: Switch in most-recent-order
 M['ctrl+pgdn'] = navigation.goto_next_buffer
+M['ctrl+shift+\t'] = navigation.goto_prev_buffer  -- TODO: Switch in most-recent-order
 M['ctrl+pgup'] = navigation.goto_prev_buffer
 M['alt+1'] = navigation.goto_buffer_1
 M['alt+2'] = navigation.goto_buffer_2
@@ -115,7 +120,13 @@ M['f2'] = navigation.goto_next_bookmark
 M['shift+f2'] = navigation.goto_prev_bookmark
 M['alt+f2'] = textadept.bookmarks.clear
 -- FIX: Error: `stack smashing detected`
--- M['\t'] = textadept.snippets.select
+-- M['ctrl+ '] = textadept.snippets.select
 
+M['alt+/'] = {
+  t = semcom.paste_todo,
+  f = semcom.paste_fix,
+  n = semcom.paste_note,
+  p = semcom.paste_poop,
+}
 
 return M
