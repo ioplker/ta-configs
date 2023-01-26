@@ -21,24 +21,26 @@ require('ta-tweaks/ctrl_tab_mru')
 
 
 if not CURSES then
-  view:set_theme('base16-tomorrow-night', {font = 'Hack', size = 16})
+  view:set_theme('my-base16-tomorrow-night', {font = 'Hack', size = 16})
+else
+  view:set_theme('term')
 end
 
 buffer.use_tabs = false
 buffer.tab_width = 2
 
+buffer.auto_c_choose_single = false
 buffer.auto_c_multi = buffer.MULTIAUTOC_EACH
 
 textadept.editing.strip_trailing_spaces = true
 textadept.editing.highlight_words = textadept.editing.HIGHLIGHT_SELECTED
-ui.find.highlight_all_matches = true
 
+ui.find.highlight_all_matches = true
 
 view.end_at_last_line = false
 
 view.edge_column = 80
 view.edge_mode = view.EDGE_LINE
-
 view.wrap_visual_flags = view.WRAPVISUALFLAG_END
 
 view.fold_by_indentation = true
