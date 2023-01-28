@@ -16,8 +16,7 @@ M['ctrl+S'] = buffer.save_as
 M['ctrl+r'] = buffer.reload
 M['ctrl+w'] = buffer.close
 M['ctrl+o'] = io.open_file
--- FIX: Error: `stack smashing detected`
--- M['ctrl+p'] = io.quick_open
+M['ctrl+p'] = io.quick_open
 
 M['ctrl+<'] = textadept.session.save
 M['ctrl+>'] = textadept.session.load
@@ -43,6 +42,8 @@ M['ctrl+/'] = editing.toggle_comment
 
 M['ctrl+shift+down'] = buffer.move_selected_lines_down
 M['ctrl+shift+up'] = buffer.move_selected_lines_up
+M['ctrl+up'] = view.line_scroll_up
+M['ctrl+down'] = view.line_scroll_down
 
 M['ctrl+k'] = {
   ['ctrl+u'] = buffer.upper_case,
@@ -72,6 +73,7 @@ M['shift+f3'] = ui.find.find_prev
 M['alt+r'] = ui.find.replace
 M['ctrl+F'] = navigation.search_selected_in_files
 
+M['ctrl+E'] = textadept.menu.select_command
 M['ctrl+g'] = textadept.editing.goto_line
 
 M['ctrl+\t'] = navigation.goto_next_buffer  -- TODO: Switch in most-recent-order
@@ -87,8 +89,7 @@ M['alt+6'] = navigation.goto_buffer_6
 M['alt+7'] = navigation.goto_buffer_7
 M['alt+8'] = navigation.goto_buffer_8
 M['alt+9'] = navigation.goto_buffer_9
--- FIX: Error: `stack smashing detected`
--- M['ctrl+b'] = ui.switch_buffer
+M['ctrl+b'] = ui.switch_buffer
 
 M['ctrl+1'] = navigation.goto_view_1
 M['ctrl+2'] = navigation.goto_view_2

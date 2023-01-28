@@ -1,16 +1,13 @@
 require('spellcheck').load('ru_RU')
 
 -- My settings
--- local command_mode = require('shortcuts').hijack()  -- NOTE: Other settings from `general` depend on this module for binding
-require('shortcuts').hijack()  -- NOTE: Other settings from `general` depend on this module for binding
+require('shortcuts').init_defaults()
 require('general/buffers')
 require('general/languages')
 
-
 -- FIX: Sync with `shortcuts` module
 -- TODO: Replace by integration with `nnn`?
--- --require('textredux').hijack(command_mode)
--- require('textredux').hijack()
+require('textredux').hijack()
 -- require('file_diff')
 
 -- FIX: Broke on TA12

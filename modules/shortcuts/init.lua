@@ -1,25 +1,6 @@
---[[ Features:
-1. Adds `keys.command_mode` with custom defaults (not Textadept's!)
-  call `hijack()` to enable and `bind()` to assign functions, e.g.:
-  ```
-    local shortcuts = require('shortcuts')
-    local bind = shortcuts.bind
-    shortcuts.hijack()
-
-    bind('ctrl+esc', reset)
-  ```
-
-  Key-chains also work
-  (but not with single letters inside the chain for now):
-  ```
-    bind('ctrl+k', {
-      ['ctrl+u'] = to_uppercase,
-      ['ctrl+l'] = to_lowercase,
-    })
-  ```
-
-2. Maps russian keys (for `йцукен` <-> `qwerty` keyboard layout)
-  see / edit `layouts_map` to fit your keyboard / language
+--[[
+Maps russian keys (for `йцукен` <-> `qwerty` keyboard layout)
+see / edit `layouts_map` to fit your keyboard / language
 ]]
 -- TODO: Make key-chains work with single letters inside
 
@@ -42,10 +23,6 @@ local ru_en_map = {
 
 local previous_keycode = nil
 
--- Custom key mode - all keys' callbacks must be assinged via `bind()`
--- Even Textadept's default ones!
-keys.custom_keys = {}
-
 -- See original function in core/keys.lua (`events.connect(events.KEY, function(code, modifiers)`)
 local function handle_keypress(code, modifiers)
   if ru_en_map[code] and ru_en_map[code] ~= code then
@@ -60,22 +37,14 @@ local function handle_keypress(code, modifiers)
   end
 end
 
-function M.hijack()
-  keys.mode = 'custom_keys'
+-- Resets default key bindings
+function M.init_defaults()
+  local _default_bindings = require('shortcuts.bindings')
+  for k, v in pairs(_default_bindings) do
+    keys[k] = v
+  end
 
-  events.connect(events.UPDATE_UI, function() keys.mode = 'custom_keys' end)
   events.connect(events.KEY, handle_keypress)
-
-  return keys.custom_keys
-end
-
-function M.bind(shortcut, callback_or_mode)
-  keys.custom_keys[shortcut] = callback_or_mode
-end
-
-local _default_bindings = require('shortcuts.bindings')
-for k, v in pairs(_default_bindings) do
-  M.bind(k, v)
 end
 
 return M
