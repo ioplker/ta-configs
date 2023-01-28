@@ -9,25 +9,48 @@
 local view, colors, styles = view, lexer.colors, lexer.styles
 
 -- NOTE: Color code format is `0xBBGGRR` (not RGB!)
+-- POOP: Inverted colors - to use with `picom` compositor to enable dark mode (until there is QT dark mode)
 -- Greyscale colors
-colors.black       = 0x211f1d --> #1d1f21
-colors.black_mid   = 0x2e2a28 --> #282a2e
-colors.black_light = 0x413b37 --> #373b41
-colors.grey        = 0x969896 --> #969896
-colors.grey_mid    = 0xb4b7b4 --> #b4b7b4
-colors.grey_light  = 0xc6c8c5 --> #c5c8c6
-colors.white       = 0xe0e0e0 --> #e0e0e0
-colors.white_pure  = 0xffffff --> #ffffff
+colors.black       = 0xdee0e2 --> #e2e0de (#1d1f21)
+colors.black_mid   = 0xd1d5d7 --> #d7d5d1 (#282a2e)
+colors.black_light = 0xbec4c8 --> #c8c4be (#373b41)
+colors.grey        = 0x696769 --> #696769 (#969896)
+colors.grey_mid    = 0x4b484b --> #4b484b (#b4b7b4)
+colors.grey_light  = 0x39373a --> #3a3739 (#c5c8c6)
+colors.white       = 0x1f1f1f --> #1f1f1f (#e0e0e0)
+colors.white_pure  = 0x000000 --> #000000 (#ffffff)
 
 -- Normal colors
-colors.red         = 0x6666cc --> #cc6666
-colors.brown       = 0x5a68a3 --> #a3685a
-colors.orange      = 0x5f93de --> #de935f
-colors.yellow      = 0x74c6f0 --> #f0c674
-colors.green       = 0x68bdb5 --> #b5bd68
-colors.cyan        = 0xb7be8a --> #8abeb7
-colors.blue        = 0xbea281 --> #81a2be
-colors.purple      = 0xbb94b2 --> #b294bb
+colors.red         = 0x999933 --> #339999 (#cc6666)
+colors.brown       = 0xa5975c --> #5c97a5 (#a3685a)
+colors.orange      = 0xa06c21 --> #216ca0 (#de935f)
+colors.yellow      = 0x8b390f --> #0f398b (#f0c674)
+colors.green       = 0x97424a --> #4a4297 (#b5bd68)
+colors.cyan        = 0x484175 --> #754148 (#8abeb7)
+colors.blue        = 0x415d7e --> #7e5d41 (#81a2be)
+colors.purple      = 0x446b4d --> #4d6b44 (#b294bb)
+
+
+-- POOP: Normal colors (see last poop)
+-- Greyscale colors
+-- colors.black       = 0x211f1d --> #1d1f21
+-- colors.black_mid   = 0x2e2a28 --> #282a2e
+-- colors.black_light = 0x413b37 --> #373b41
+-- colors.grey        = 0x969896 --> #969896
+-- colors.grey_mid    = 0xb4b7b4 --> #b4b7b4
+-- colors.grey_light  = 0xc6c8c5 --> #c5c8c6
+-- colors.white       = 0xe0e0e0 --> #e0e0e0
+-- colors.white_pure  = 0xffffff --> #ffffff
+--
+-- Normal colors
+-- colors.red         = 0x6666cc --> #cc6666
+-- colors.brown       = 0x5a68a3 --> #a3685a
+-- colors.orange      = 0x5f93de --> #de935f
+-- colors.yellow      = 0x74c6f0 --> #f0c674
+-- colors.green       = 0x68bdb5 --> #b5bd68
+-- colors.cyan        = 0xb7be8a --> #8abeb7
+-- colors.blue        = 0xbea281 --> #81a2be
+-- colors.purple      = 0xbb94b2 --> #b294bb
 
 -- Default font.
 if not font then font = WIN32 and 'Consolas' or OSX and 'Monaco' or 'Monospace' end

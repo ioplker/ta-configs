@@ -33,22 +33,26 @@ local M = {}
 function M.set_semcom_styles(styles)
   styles['todo_comment'] = {
     italics = true, bold = true,
-    back = 0x000000, fore = 0x009999,
+    -- back = 0x000000, fore = 0x009999,
+    back = 0xffffff, fore = 0xff6666,  -- POOP: Inverted for dark mode with `picom`
   }
 
   styles['fix_comment'] = {
     italics = true, bold = true,
-    back = 0x000000, fore = 0x000099,
+    -- back = 0x000000, fore = 0x000099,
+    back = 0xffffff, fore = 0xffff66,  -- POOP: Inverted for dark mode with `picom`
   }
 
   styles['note_comment'] = {
     italics = true, bold = true,
-    back = 0x000000, fore = 0xCC6600,
+    -- back = 0x000000, fore = 0xCC6600,
+    back = 0xffffff, fore = 0x3399ff,  -- POOP: Inverted for dark mode with `picom`
   }
 
   styles['poop_comment'] = {
     italics = true, bold = true,
-    back = 0x000000, fore = 0x990099,
+    -- back = 0x000000, fore = 0x990099,
+    back = 0xffffff, fore = 0x66ff66,  -- POOP: Inverted for dark mode with `picom`
   }
 end
 

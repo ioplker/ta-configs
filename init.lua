@@ -57,10 +57,11 @@ view.fold_by_indentation = true
 --[[
   happens when caret is on trailing whitespace at line end
 ]]
--- TODO: Go to next line on (un)commenting
 -- TODO: Add `command palette`
--- TODO: Don't go to file end on opening
 -- TODO: Add command to fold/unfold on specific levels
+--[[
+  go to nested levels with `view.contracted_fold_next`
+]]
 -- TODO: Place closing bracket only if next symbol is a whitespace (or newline)
 -- TODO: Enclose selected text in brackets and quotes (`textadept.editing.enclose(left, right, select)`)
 -- TODO: Copy/paste with multiline selection (paste to coresponding line - not all copied text at once; `buffer.MULTIPASTE_EACH`?)
@@ -70,7 +71,7 @@ view.fold_by_indentation = true
 -- TODO: Do not move (scroll) on creating/deleting views (`buffer.anchor`?)
 
 -- TODO: Highlight current view (`view:set_styles()`)
--- TODO: Spellcheck comments too
+-- TODO: Spellcheck semantic comments too
 -- TODO: Spellcheck all text in markdown
 -- TODO: LSP for Elixir
 -- TODO: Code formatter for Elixir (https://github.com/orbitalquark/textadept-format)
@@ -87,6 +88,8 @@ view.fold_by_indentation = true
 -- TODO: Extend html lexer to recognize JS in tags' attributes (e.g. for angular or alpinejs)
 -- TODO: Snippets for html
 -- TODO: Snippets for JS
+-- TODO: Snippets for CSS
+-- TODO: Snippets for SCSS
 -- TODO: Snippets for Elixir
 -- TODO: Snippets for PlantUML
 -- TODO: Snippets for OpenAPI
@@ -116,3 +119,11 @@ view.fold_by_indentation = true
 -- FIX: Folding breaks when commenting fold's parent line
 -- FIX: Ctrl+tab and ctrl+shift+tab
 -- TODO: Change buffers only in current view
+
+-- TODO: Check buffer changes on undo to remove `*` from buffer's tab if there are no unsaved changes
+-- TODO: Don't show `*` in system buffers' (_type ~= nil) tabs
+-- TODO: Don't split view when searching in files
+-- FIX: Update tabs' labels on dragging in Qt
+-- FIX: Enter russian letters in textredux buffers
+-- TODO: Create own menu
+-- FIX: `Select command` in textredux
