@@ -1,3 +1,11 @@
+-- HTML
+events.connect(events.LEXER_LOADED, function(name)
+  if name == 'html' then
+    require('snippets/html')
+  end
+end)
+
+
 -- Nim-tools
 events.connect(events.LEXER_LOADED, function(name)
   if name ~= 'nim' then return end

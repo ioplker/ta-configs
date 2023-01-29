@@ -93,4 +93,10 @@ local _drop_completed_word_tail = function()
 end
 events.connect(events.AUTO_C_COMPLETED, _drop_completed_word_tail)
 
+function M.insert_snippet()
+  if textadept.snippets.insert() == false then
+    textadept.snippets.select()
+  end
+end
+
 return M

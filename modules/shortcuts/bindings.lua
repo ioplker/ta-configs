@@ -121,8 +121,8 @@ M['ctrl+f2'] = textadept.bookmarks.toggle
 M['f2'] = navigation.goto_next_bookmark
 M['shift+f2'] = navigation.goto_prev_bookmark
 M['alt+f2'] = textadept.bookmarks.clear
--- FIX: Error: `stack smashing detected`
--- M['ctrl+ '] = textadept.snippets.select
+M['ctrl+ '] = editing.insert_snippet
+M['alt+ '] = textadept.snippets.previous
 
 M['alt+/'] = {
   t = semcom.paste_todo,

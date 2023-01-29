@@ -127,3 +127,10 @@ view.fold_by_indentation = true
 -- FIX: Enter russian letters in textredux buffers
 -- TODO: Create own menu
 -- FIX: `Select command` in textredux
+
+-- FIX: Selection in snippets overwrites next text, e.g. in html snippet `area`
+--[[
+  <area shape="%6{default,rect,circle,poly}" coords="%7" href="%8" alt="%9">
+]]
+
+-- FIX: Error on snippets autocomplete when there are no snippets for current lexer
