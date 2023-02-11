@@ -4,6 +4,7 @@ require('spellcheck').load('ru_RU')
 require('shortcuts').init_defaults()
 require('general/buffers')
 require('general/languages')
+require('general/singleton')
 
 -- FIX: Sync with `shortcuts` module
 -- TODO: Replace by integration with `nnn`?
