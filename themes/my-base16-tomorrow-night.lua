@@ -97,6 +97,22 @@ styles[lexer.WHITESPACE] = {}
 styles[lexer.TAG] = {fore = colors.purple}
 styles[lexer.ATTRIBUTE] = {fore = colors.yellow}
 
+-- Markdown
+styles['heading_h1'] = {fore = colors.red, bold = true, italics = true}
+styles['heading_h2'] = {fore = colors.brown, bold = true, italics = true}
+styles['heading_h3'] = {fore = colors.orange, bold = true, italics = true}
+styles['heading_h4'] = {fore = colors.yellow, bold = true, italics = true}
+styles['heading_h5'] = {fore = colors.green, bold = true, italics = true}
+styles['heading_h6'] = {fore = colors.cyan, bold = true, italics = true}
+styles['italic'] = {italics = true}
+styles['bold'] = {bold = true}
+styles['bold_italic'] = {bold = true, italics = true}
+styles['code'] = {fore = colors.red, back = colors.black_mid}
+styles['hr'] = {fore = colors.orange, back = colors.black_light, bold = true, eol_filled = true}
+styles['link'] = {italics = true, underline = true, fore = colors.blue}
+styles['reference'] = {italics = true, underline = true, fore = colors.blue}
+styles['list'] = {fore = colors.orange}
+
 
 --[[----------------------------------------------------------------------------
 Caret and Selection Styles
