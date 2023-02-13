@@ -17,9 +17,9 @@ printf "Starting singleton app: $APP\nUsing command: $APP_CMD\n"
 mkdir -p $TA_FILES_DIR
 
 IFS=';' read -ra PID_LIST <<< "$(pidof -S ';' $APP)"
-APP_PID=${PID_LIST[-1]}
 
-if [ -n "$APP_PID" ]; then
+if [ -n "$PID_LIST" ]; then
+  APP_PID=${PID_LIST[-1]}
   FILES_TO_OPEN=""
 
   for var in "$@"
@@ -31,9 +31,9 @@ if [ -n "$APP_PID" ]; then
     printf "Adding files to open by Textadept\n"
     echo -e $FILES_TO_OPEN > $TA_FILES_DIR/$(date +"%s")_files.txt
   fi
+
+  flock --nonblock $LOCK_PATH $APP_CMD
+  xdotool search --pid $APP_PID | xargs -I % i3-msg '[id="%"] focus'
+else
+  flock --nonblock $LOCK_PATH $APP_CMD
 fi
-
-printf "\n"
-flock --nonblock $LOCK_PATH $APP_CMD
-
-xdotool search --pid $APP_PID | xargs -I % i3-msg '[id="%"] focus'

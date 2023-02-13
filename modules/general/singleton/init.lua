@@ -46,6 +46,15 @@ restart_watcher = function()
   watcher_proc = os.spawn("fswatch -0 ".. FILES_DIR .. " -1 --event Created", parse_paths_list)
 end
 
+events.connect(events.QUIT,
+  function()
+    if watcher_proc ~= nil then
+      watcher_proc:kill()
+      watcher_proc:wait()
+    end
+  end
+)
+
 
 -- Entry point
 os.spawn("pidof -s textadept",
